@@ -7,6 +7,7 @@
 package ui.selenium.test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,14 +37,14 @@ public class CarData
             throw new RuntimeException("Test input file not found: " + filePath);
         }
 
-        try (Stream<String> lines = Files.lines(Paths.get(resourceUrl.getPath())))
+        try (Stream<String> lines = Files.lines(Paths.get(resourceUrl.toURI())))
         {
             String content = lines.collect(Collectors.joining(" "));
             Pattern pattern = Pattern.compile(REGEX_PATTERN);
             Matcher matcher = pattern.matcher(content);
             return matcher.results().map(MatchResult::group).collect(Collectors.toList());
         }
-        catch (IOException e)
+        catch (IOException | URISyntaxException e)
         {
             throw new RuntimeException(e);
         }
@@ -57,7 +58,7 @@ public class CarData
             throw new RuntimeException("Expected test output file not found: " + filePath);
         }
 
-        try (Stream<String> lines = Files.lines(Paths.get(resourceUrl.getPath())))
+        try (Stream<String> lines = Files.lines(Paths.get(resourceUrl.toURI())))
         {
             Map<String, Car> data = new HashMap<>();
             lines.skip(1) // Skip the CSV header
@@ -75,7 +76,7 @@ public class CarData
                     });
             return data;
         }
-        catch (IOException e)
+        catch (IOException | URISyntaxException e)
         {
             throw new RuntimeException(e);
         }
